@@ -47,7 +47,8 @@ export const saveChats = async (payload) => {
           $push: {
             "chatIds.$.chats": chat._id,
           },
-        }
+        },
+        { upsert: true, returnDocument: "after" }
       );
 
       //saved in reciever chats
@@ -57,7 +58,8 @@ export const saveChats = async (payload) => {
           $push: {
             "chatIds.$.chats": chat._id,
           },
-        }
+        },
+        { upsert: true, returnDocument: "after" }
       );
       return "Success";
     })
