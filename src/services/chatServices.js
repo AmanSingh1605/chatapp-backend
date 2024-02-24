@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { Chat } from "../models/chat";
-import { User } from "../models/user";
+import { Chat } from "../models/chat.js";
+import { User } from "../models/user.js";
 
 //get respective chats
-export const getUserChats = async (userId, otherId) => {
-  const userId = new mongoose.Schema.Types.ObjectId(userId);
-  const otherId = new mongoose.Schema.Types.ObjectId(otherId);
+export const getUserChats = async (uId, oId) => {
+  const userId = new mongoose.Schema.Types.ObjectId(uId);
+  const otherId = new mongoose.Schema.Types.ObjectId(oId);
   const UserChats = await User.aggregate(
     { $match: { _id: userId } },
     { $unwind: "$chatIds" },
@@ -80,8 +80,8 @@ export const getAllChats = async () => {
 };
 
 //return all chats for a user
-export const getUserOnlyChats = async (userId) => {
-  const userId = mongoose.Schema.Types.ObjectId(userId);
+export const getUserOnlyChats = async (uId) => {
+  const userId = mongoose.Schema.Types.ObjectId(uId);
   await User.findOne({ _id: userId }, { chatIds: 1 })
     .then((result) => {
       return result;
