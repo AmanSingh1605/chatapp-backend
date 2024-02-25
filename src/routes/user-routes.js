@@ -7,6 +7,6 @@ const router = express.Router();
 
 //routers chats
 router.get("/login", LoginHandler);
-router.put("/signup", SignupHandler);
+router.post("/signup", SignupHandler);
 router.use("/chats", Chats);
 export default router;

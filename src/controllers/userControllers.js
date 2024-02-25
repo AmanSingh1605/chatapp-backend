@@ -1,4 +1,6 @@
+import jwt from "jsonwebtoken";
 import { CreateUser, LoginUser } from "../services/userServices.js";
+import { generateAuthToken } from "../jwtAuth.js";
 
 const LoginHandler = async (req, res) => {
   const userData = {
@@ -6,12 +8,14 @@ const LoginHandler = async (req, res) => {
     password: req.query.password,
   };
   const response = await LoginUser(userData);
-  if( response ){
+  // console.log(response);
+  if (response) {
+    //generate JSON web token
+    const token = generateAuthToken(response);
     console.log("User: " + response.name + " is logged in");
-    res.send(response);
-  }
-  else{
-    console.log("User not found!")
+    res.send({ response, token });
+  } else {
+    console.log("User not found!");
     res.send("Username or password is wrong!");
   }
 };
