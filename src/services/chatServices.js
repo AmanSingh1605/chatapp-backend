@@ -4,8 +4,8 @@ import { User } from "../models/user.js";
 
 //get respective chats
 export const getUserChats = async (uId, oId) => {
-  const userId = new mongoose.Schema.Types.ObjectId(uId);
-  const otherId = new mongoose.Schema.Types.ObjectId(oId);
+  const userId = new mongoose.Types.ObjectId(uId);
+  const otherId = new mongoose.Types.ObjectId(oId);
   const UserChats = await User.aggregate(
     { $match: { _id: userId } },
     { $unwind: "$chatIds" },
@@ -30,8 +30,8 @@ export const getUserChats = async (uId, oId) => {
 
 //save chats for a user
 export const saveChats = async (payload) => {
-  const senderId = mongoose.Schema.Types.ObjectId(payload.senderId);
-  const recieverId = mongoose.Schema.Types.ObjectId(payload.recieverId);
+  const senderId = new mongoose.Types.ObjectId(payload.senderId);
+  const recieverId = new mongoose.Types.ObjectId(payload.recieverId);
   const newChat = new Chat({
     senderId,
     recieverId,
@@ -48,7 +48,7 @@ export const saveChats = async (payload) => {
             "chatIds.$.chats": chat._id,
           },
         },
-        { upsert: true, returnDocument: "after" }
+        { upsert: true }
       );
 
       //saved in reciever chats
@@ -59,35 +59,45 @@ export const saveChats = async (payload) => {
             "chatIds.$.chats": chat._id,
           },
         },
-        { upsert: true, returnDocument: "after" }
+        { upsert: true }
       );
       return "Success";
     })
-    .catch(() => {
-      console.log("Chat: \n" + newChat + " \n is unable to save.");
+    .catch((err) => {
+      console.log(
+        "Chat: \n" + newChat + " \n is unable to save due to : \n " + err
+      );
       return "Fail to send message";
     });
+  return response;
 };
 
 //return all chats
 export const getAllChats = async () => {
-  await Chat.find()
-    .then((result) => result)
+  const response = await Chat.find()
+    .then((result) => {
+      console.log("all chats successfully fetched");
+      return result;
+    })
     .catch((error) => {
       console.log("Unable to load chats due to some error: \n" + error);
       return "Error occured";
     });
+  return response;
 };
 
 //return all chats for a user
 export const getUserOnlyChats = async (uId) => {
-  const userId = mongoose.Schema.Types.ObjectId(uId);
-  await User.findOne({ _id: userId }, { chatIds: 1 })
+  const userId = new mongoose.Types.ObjectId(uId);
+  const response = await User.findOne({ _id: userId }, { chatIds: 1 })
+    .populate("chatIds.chats")
     .then((result) => {
+      console.log(result);
       return result;
     })
     .catch((error) => {
       console.log("Unable to load chats: \n" + error);
       return "Failed to load chats";
     });
+  return response;
 };

@@ -1,7 +1,6 @@
 import {
   getAllChats,
   getUserChats,
-  getUserOnlyChats,
   saveChats,
 } from "../services/chatServices.js";
 
@@ -13,51 +12,47 @@ export class Chat {
     this.message = message;
   }
 
-  async loadUserChat(req, res) {
-    const response = await getUserChats(this.senderId, this.recieverId);
-    if (response) {
-      console.log(typeof response + " recieved of size " + response.length);
-      res.send(response);
-    } else {
-      console.log("Something went wrong: ");
-      res.status(500).send("Unable to load chats");
-    }
-  }
-
-  async saveUserChat(req, res) {
+  async saveUserChat() {
     const payload = {
       senderId: this.senderId,
       recieverId: this.recieverId,
       message: this.message,
     };
-    await saveChats(payload)
-      .then((result) => res.send(result))
-      .catch((error) =>
-        res.staus(500).send({ Error: "Something went wrong." })
-      );
-  }
 
-  async userChats() {
-    await getUserOnlyChats(this.userId)
-      .then((result) => res.send(result))
+    await saveChats(payload)
+      .then((result) => {
+        console.log("message sent to user successfully");
+      })
       .catch((error) => {
-        res.status(500).send({ Error: "not able to get user chats" });
+        console.log("Something went wrong: \n" + error);
       });
   }
+
+
 }
 
 //function related to chat dbs
-export const userChats = async (req, res) => {
-  const userId = req.query.userId;
-  await userChats(userId)
-    .then((result) => res.send(result))
-    .catch((err) => res.status(500).send({ Error: "Something went wrong" }));
-};
 
+//return all chats in dbs
 export const allChats = async (req, res) => {
   await getAllChats()
-    .then((result) => res.send(result))
+    .then((result) => {
+      console.log(result);
+      res.send(result);
+    })
     .catch((error) => {
-      res.status(500).send({ Error: "Unable to load chats" });
+      res.status(500).send({ Error: "Unable to load chats : \n" + error });
     });
 };
+
+//load userChat with another user
+export async function loadUserChat(req, res) {
+  const response = await getUserChats(this.senderId, this.recieverId);
+  if (response) {
+    console.log(typeof response + " recieved of size " + response.length);
+    res.send(response);
+  } else {
+    console.log("Something went wrong: ");
+    res.status(500).send("Unable to load chats");
+  }
+}

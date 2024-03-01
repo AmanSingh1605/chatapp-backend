@@ -1,10 +1,18 @@
 //Routes for chats will be defined here.
 import express from "express";
-import { userChats, allChats } from "../controllers/chatControllers.js";
+import { allChats } from "../controllers/chatControllers.js";
+import {
+  addNewUserChatHandler,
+  userChatHandler,
+  userOnlyChatHandler,
+} from "../controllers/userControllers.js";
+
 const router = express.Router();
 
 //routers chats
-router.get("/:userId",userChats);
-router.get("/",allChats);
+router.get("/:userId/:senderId", userChatHandler);
+router.get("/all", allChats);
+router.get("/:userId", userOnlyChatHandler);
+router.post("/:userId/:senderId", addNewUserChatHandler);
 
 export default router;
